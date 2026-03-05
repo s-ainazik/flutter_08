@@ -11,6 +11,7 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.month; // ← Добавлено состояние
   final Map<DateTime, List<String>> _events = {};
 
   List<String> _getEventsForDay(DateTime day) {
@@ -56,7 +57,6 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  // Новая функция для удаления события
   void _deleteEvent(int index) {
     final key = DateTime(
       _selectedDay.year,
@@ -135,11 +135,16 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ),
 
-            // Добавлено: переключение между месяцем/неделей
-            calendarFormat: CalendarFormat.month,
+            // ИСПРАВЛЕНО: Добавлен onFormatChanged для переключения
+            calendarFormat: _calendarFormat,
             availableCalendarFormats: const {
               CalendarFormat.month: 'Месяц',
               CalendarFormat.week: 'Неделя',
+            },
+            onFormatChanged: (format) {  // ← ЭТО БЫЛО ПРОПУЩЕНО
+              setState(() {
+                _calendarFormat = format;
+              });
             },
           ),
           SizedBox(height: 16),
@@ -159,7 +164,6 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: ListTile(
                         leading: Icon(Icons.event),
                         title: Text(events[index]),
-                        // Добавлена кнопка удаления
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () => _deleteEvent(index),
